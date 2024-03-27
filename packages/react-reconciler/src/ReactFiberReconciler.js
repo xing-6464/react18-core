@@ -6,4 +6,5 @@ export function createContainer(containerInfo) {
 
 export function updateContainer(element, container) {
   // main render
+  console.log(element, container)
 }

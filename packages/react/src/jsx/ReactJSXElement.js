@@ -19,11 +19,11 @@ function ReactElement(type, key, ref, props) {
 }
 
 function hasValidKey(config) {
-  return config.ref !== undefined
+  return config.key !== undefined
 }
 
 function hasValidRef(config) {
-  return config.key !== undefined
+  return config.ref !== undefined
 }
 
 export function jsxDEV(type, config, maybekey) {

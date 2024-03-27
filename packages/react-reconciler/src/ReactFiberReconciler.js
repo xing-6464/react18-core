@@ -1,5 +1,6 @@
 import { createFiberRoot } from './ReactFiberRoot'
 import { createUpdate, enqueueUpdate } from './ReactFiberClassUpdateQueue'
+import { scheduleUpdateOnFiber } from './ReactFiberWorkLoop'
 
 export function createContainer(containerInfo) {
   return createFiberRoot(containerInfo)

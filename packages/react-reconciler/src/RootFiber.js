@@ -24,3 +24,10 @@ export function createFiber(tag, pendingProps, key) {
 export function createHostRootFiber() {
   return createFiber(HostRoot, null, null)
 }
+
+export function createWorkInProgress(current, pendingProps) {
+  let workInProgress = current.alternate
+  if (workInProgress === null) {
+    workInProgress = createFiber(current.tag, pendingProps, current.key)
+  }
+}

@@ -21,9 +21,29 @@ function performConcurrentWorkOnRoot(root) {
 
 function renderRootSync(root) {
   prepareFreshStack(root)
-  // workLoopSync()
+  workLoopSync()
 }
 
 function prepareFreshStack(root) {
   workInProgress = createWorkInProgress(root.current, null)
 }
+
+function workLoopSync() {
+  while (workInProgress !== null) {
+    performUnitOfWork(workInProgress)
+  }
+}
+
+function performUnitOfWork(unitOfWork) {
+  const current = unitOfWork.alternate
+  const next = beginWork(current, unitOfWork)
+  unitOfWork.memoizedProps = unitOfWork.pendingProps
+
+  if (next === null) {
+    completeUnitOfWork(unitOfWork)
+  } else {
+    workInProgress = next
+  }
+}
+
+function completeUnitOfWork(unitOfWork) {}

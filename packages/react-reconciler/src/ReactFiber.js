@@ -47,3 +47,9 @@ export function createWorkInProgress(current, pendingProps) {
   workInProgress.index = current.index
   return workInProgress
 }
+
+export function createFiberFromElement(element) {
+  const { type, key, props: pendingProps } = element
+}
+
+export function createFiberFromText(element) {}

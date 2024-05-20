@@ -1,4 +1,4 @@
-import { createHostRootFiber } from './RootFiber'
+import { createHostRootFiber } from './ReactFiber'
 import { initialUpdateQueue } from './ReactFiberClassUpdateQueue'
 
 function FiberRootNode(containerInfo) {

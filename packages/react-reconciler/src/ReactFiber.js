@@ -1,4 +1,9 @@
-import { HostRoot } from 'react-reconciler/src/ReactWorkTags'
+import {
+  IndeterminateComponent,
+  HostComponent,
+  HostRoot,
+  HostText,
+} from 'react-reconciler/src/ReactWorkTags'
 import { NoFlags } from 'react-reconciler/src/ReactFiberFlags'
 
 export function FiberNode(tag, pendingProps, key) {
@@ -48,8 +53,21 @@ export function createWorkInProgress(current, pendingProps) {
   return workInProgress
 }
 
-export function createFiberFromElement(element) {
-  const { type, key, props: pendingProps } = element
+function createFiberFromTypeAndProps(type, key, pendingProps) {
+  let tag = IndeterminateComponent
+  if (typeof type === 'string') {
+    tag = HostComponent
+  }
+  const fiber = createFiber(tag, pendingProps, key)
+  fiber.type = type
+  return fiber
 }
 
-export function createFiberFromText(element) {}
+export function createFiberFromElement(element) {
+  const { type, key, props: pendingProps } = element
+  return createFiberFromTypeAndProps(type, key, pendingProps)
+}
+
+export function createFiberFromText(element) {
+  return createFiber(HostText, element, null)
+}

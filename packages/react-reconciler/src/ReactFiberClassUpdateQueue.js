@@ -30,3 +30,8 @@ export function enqueueUpdate(fiber, update) {
 
   return markUpdateLaneFromFiberToRoot(fiber)
 }
+
+export function processUpdateQueue(workInProgress) {
+  const queue = workInProgress.updateQueue
+  const pendingQueue = queue.shared.pending
+}

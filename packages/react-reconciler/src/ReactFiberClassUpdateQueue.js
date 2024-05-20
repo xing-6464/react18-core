@@ -1,4 +1,5 @@
 import { markUpdateLaneFromFiberToRoot } from './ReactConcurrentUpdates'
+import assign from 'shared/assign'
 
 export function initialUpdateQueue(fiber) {
   const queue = {
@@ -34,4 +35,24 @@ export function enqueueUpdate(fiber, update) {
 export function processUpdateQueue(workInProgress) {
   const queue = workInProgress.updateQueue
   const pendingQueue = queue.shared.pending
+  if (pendingQueue !== null) {
+    queue.shared.pending = null
+    const lastPendingUpdate = pendingQueue
+    const firstPendingUpdate = lastPendingUpdate.next
+
+    lastPendingUpdate.next = null
+    let newState = workInProgress.memoizedState
+    let update = firstPendingUpdate
+    while (update) {
+      newState = getStateFromUpdate(update, newState)
+      update = update.next
+    }
+
+    workInProgress.memoizedState = newState
+  }
+}
+
+function getStateFromUpdate(update, prevState) {
+  const { payload } = update
+  return assign({}, prevState, payload)
 }

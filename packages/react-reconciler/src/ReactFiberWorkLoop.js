@@ -1,5 +1,5 @@
 import { scheduleCallback } from 'scheduler'
-import { createWorkInProgress } from './reactFiber'
+import { createWorkInProgress } from './ReactFiber'
 import { beginWork } from './ReactFiberBeginWork'
 
 let workInProgress = null
@@ -40,11 +40,12 @@ function performUnitOfWork(unitOfWork) {
   const next = beginWork(current, unitOfWork)
   unitOfWork.memoizedProps = unitOfWork.pendingProps
 
-  if (next === null) {
-    completeUnitOfWork(unitOfWork)
-  } else {
-    workInProgress = next
-  }
+  workInProgress = null
+  // if (next === null) {
+  //   completeUnitOfWork(unitOfWork)
+  // } else {
+  //   workInProgress = next
+  // }
 }
 
 function completeUnitOfWork(unitOfWork) {}

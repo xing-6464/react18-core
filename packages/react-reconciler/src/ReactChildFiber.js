@@ -1,5 +1,7 @@
 import { createFiberFromElement, createFiberFromText } from './ReactFiber'
 import { Placement } from './ReactFiberFlags'
+import { REACT_ELEMENT_TYPE } from 'shared/ReactSymbols'
+import isArray from 'shared/isArray'
 
 function createChildReconciler(shouldTrackSideEffects) {
   function reconcileSingleElement(returnFiber, currentFirstChild, element) {
@@ -14,6 +16,29 @@ function createChildReconciler(shouldTrackSideEffects) {
     if (shouldTrackSideEffects) {
       newFiber.flags |= Placement
     }
+  }
+
+  function createChild(returnFiber, newChild) {
+    if (
+      (typeof newChild === 'string' && newChild !== '') ||
+      typeof newChild === 'number'
+    ) {
+      const created = createFiberFromText(`${newChild}`)
+      created.return = returnFiber
+      return created
+    }
+    if (typeof newChild === 'object' && newChild !== null) {
+      switch (newChild.$$typeof) {
+        case REACT_ELEMENT_TYPE: {
+          const created = createFiberFromElement(newChild)
+          created.return = returnFiber
+          return created
+        }
+        default:
+          break
+      }
+    }
+    return null
   }
 
   function reconcileChildrenArray(returnFiber, currentFirstChild, newChildren) {

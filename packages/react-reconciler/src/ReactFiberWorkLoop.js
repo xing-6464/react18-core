@@ -1,7 +1,7 @@
 import { scheduleCallback } from 'scheduler'
 import { createWorkInProgress } from './ReactFiber'
 import { beginWork } from './ReactFiberBeginWork'
-import { completeWork} from './ReactFiberCompleteWork'
+import { completeWork } from './ReactFiberCompleteWork'
 
 let workInProgress = null
 

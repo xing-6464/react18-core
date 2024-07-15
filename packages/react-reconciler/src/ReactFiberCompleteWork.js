@@ -1,4 +1,11 @@
-import { NoFlags } from "./ReactFiberFlags"
+import { NoFlags } from './ReactFiberFlags'
+import { HostRoot, HostComponent, HostText } from './ReactWorkTags'
+import {
+  createTextInstance,
+  createInstance,
+  finalizeInitialChildren,
+  appendInitialChild,
+} from './react-dom-bindings/src/client/ReactDOMHostConfig'
 
 /**
  * 挂载子节点
@@ -6,7 +13,7 @@ import { NoFlags } from "./ReactFiberFlags"
  * @param {*} workInProgress 当前fiber节点
  */
 function appendAllChildren(parent, workInProgress) {
-  let node = workInProgress.child 
+  let node = workInProgress.child
   while (node) {
     if (node.tag === HostComponent || HostText) {
       appendInitialChild(parent, node.stateNode)
@@ -20,7 +27,7 @@ function appendAllChildren(parent, workInProgress) {
     // 找兄弟节点
     while (node.sibling === null) {
       if (node.return === null || node.return === workInProgress) {
-        return 
+        return
       }
       node = node.return
     }
@@ -29,7 +36,7 @@ function appendAllChildren(parent, workInProgress) {
 }
 
 /**
- * 
+ *
  * @param {*} current old fiber
  * @param {*} workInProgress new fiber
  */
@@ -40,7 +47,7 @@ export function completeWork(current, workInProgress) {
       bubbleProperties(workInProgress)
       break
     case HostComponent:
-      const {type} = workInProgress
+      const { type } = workInProgress
       const instance = createInstance(type, newProps, workInProgress)
       appendAllChildren(instance, workInProgress)
       workInProgress.stateNode = instance
@@ -57,7 +64,7 @@ export function completeWork(current, workInProgress) {
 
 /**
  * 属性冒泡、把子节点的属性都传递给父节点
- * @param {*} fiber 
+ * @param {*} fiber
  */
 function bubbleProperties(fiber) {
   let subtreeFlags = NoFlags

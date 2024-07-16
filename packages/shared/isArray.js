@@ -1,2 +1,2 @@
-const { isArray } = Array
-export default isArray
+const { isArray } = Array;
+export default isArray;

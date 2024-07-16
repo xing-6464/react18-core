@@ -1,2 +1,2 @@
-const { hasOwnProperty } = Object.prototype
-export default hasOwnProperty
+const { hasOwnProperty } = Object.prototype;
+export default hasOwnProperty;

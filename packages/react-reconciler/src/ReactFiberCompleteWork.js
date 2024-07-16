@@ -1,78 +1,77 @@
-import { NoFlags } from './ReactFiberFlags'
-import { HostRoot, HostComponent, HostText } from './ReactWorkTags'
 import {
   createTextInstance,
   createInstance,
-  finalizeInitialChildren,
   appendInitialChild,
-} from 'react-dom-bindings/src/client/ReactDOMHostConfig'
+  finalizeInitialChildren
+} from 'react-dom-bindings/src/client/ReactDOMHostConfig';
+import { NoFlags } from "./ReactFiberFlags";
+import { HostComponent, HostRoot, HostText } from "./ReactWorkTags";
 
 /**
- * 挂载子节点
- * @param {*} parent 真实DOM节点
- * @param {*} workInProgress 当前fiber节点
+ * 为完成的fiber节点的父DOM节点添加所有子DOM节点
+ * @param {DOM} parent - 完成的fiber节点对应的真实DOM节点
+ * @param {Fiber} workInProgress - 已完成的Fiber节点
  */
 function appendAllChildren(parent, workInProgress) {
-  let node = workInProgress.child
+  let node = workInProgress.child;
   while (node) {
-    if (node.tag === HostComponent || HostText) {
-      appendInitialChild(parent, node.stateNode)
+    if (node.tag === HostComponent || node.tag === HostText) {
+      appendInitialChild(parent, node.stateNode);
     } else if (node.child !== null) {
-      node = node.child
-      continue
+      node = node.child;
+      continue;
     }
     if (node === workInProgress) {
-      return
+      return;
     }
-    // 找兄弟节点
     while (node.sibling === null) {
       if (node.return === null || node.return === workInProgress) {
-        return
+        return;
       }
-      node = node.return
+      node = node.return;
     }
-    node = node.sibling
+    node = node.sibling;
   }
 }
 
 /**
- *
- * @param {*} current old fiber
- * @param {*} workInProgress new fiber
+ * 完成一个Fiber节点
+ * @param {Fiber} current - 当前旧的Fiber节点
+ * @param {Fiber} workInProgress - 新建的Fiber节点
  */
 export function completeWork(current, workInProgress) {
-  const newProps = workInProgress.pendingProps
+  const newProps = workInProgress.pendingProps;
   switch (workInProgress.tag) {
     case HostRoot:
-      bubbleProperties(workInProgress)
-      break
+      bubbleProperties(workInProgress);
+      break;
     case HostComponent:
-      const { type } = workInProgress
-      const instance = createInstance(type, newProps, workInProgress)
-      appendAllChildren(instance, workInProgress)
-      workInProgress.stateNode = instance
-      finalizeInitialChildren(instance, type, newProps)
-      bubbleProperties(workInProgress)
-      break
+      const { type } = workInProgress;
+      const instance = createInstance(type, newProps, workInProgress);
+      appendAllChildren(instance, workInProgress);
+      workInProgress.stateNode = instance;
+      finalizeInitialChildren(instance, type, newProps);
+      bubbleProperties(workInProgress);
+      break;
     case HostText:
-      const newText = newProps
-      workInProgress.stateNode = createTextInstance(newText)
-      bubbleProperties(workInProgress)
-      break
+      const newText = newProps;
+      workInProgress.stateNode = createTextInstance(newText);
+      bubbleProperties(workInProgress);
+      break;
   }
 }
 
 /**
- * 属性冒泡、把子节点的属性都传递给父节点
- * @param {*} fiber
+ * 冒泡处理已完成Fiber节点的属性
+ * @param {Fiber} completedWork - 已完成的Fiber节点
  */
-function bubbleProperties(fiber) {
-  let subtreeFlags = NoFlags
-  let child = fiber.child
+function bubbleProperties(completedWork) {
+  let subtreeFlags = NoFlags;
+  let child = completedWork.child;
   while (child !== null) {
-    subtreeFlags |= child.subtreeFlags
-    subtreeFlags |= child.flags
-    child = child.sibling
+    subtreeFlags |= child.subtreeFlags;
+    subtreeFlags |= child.flags;
+    child = child.sibling;
   }
-  fiber.subtreeFlags = subtreeFlags
+  completedWork.subtreeFlags = subtreeFlags;
 }

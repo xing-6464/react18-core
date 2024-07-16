@@ -2,6 +2,8 @@ import { scheduleCallback } from 'scheduler'
 import { createWorkInProgress } from './ReactFiber'
 import { beginWork } from './ReactFiberBeginWork'
 import { completeWork } from './ReactFiberCompleteWork'
+import { MutationMask, NoFlags } from './ReactFiberFlags'
+import { commitMutationEffects } from './ReactFiberCommitWork'
 
 let workInProgress = null
 
@@ -38,7 +40,13 @@ function performConcurrentWorkOnRoot(root) {
  */
 function commitRoot(root) {
   const { finishedWork } = root
-  console.log('开始commitWork')
+  const subtreeHasEffects =
+    (finishedWork.subtreeFlags & MutationMask) != NoFlags
+  const rootHasEffect = (finishedWork.flags & MutationMask) != NoFlags
+  if (subtreeHasEffects || rootHasEffect) {
+    commitMutationEffects(finishedWork, root)
+  }
+  root.current = finishedWork
 }
 
 /**

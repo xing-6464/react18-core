@@ -31,12 +31,13 @@ function prepareFreshStack(root) {
 }
 
 function workLoopSync() {
-  while (workInProgress !== null) {
+  while (workInProgress != null) {
     performUnitOfWork(workInProgress)
   }
 }
 
 function performUnitOfWork(unitOfWork) {
+  console.log('performUnitOfWork', unitOfWork)
   const current = unitOfWork.alternate
   const next = beginWork(current, unitOfWork)
   unitOfWork.memoizedProps = unitOfWork.pendingProps

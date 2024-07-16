@@ -5,7 +5,7 @@ import {
   createInstance,
   finalizeInitialChildren,
   appendInitialChild,
-} from './react-dom-bindings/src/client/ReactDOMHostConfig'
+} from 'react-dom-bindings/src/client/ReactDOMHostConfig'
 
 /**
  * 挂载子节点

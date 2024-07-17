@@ -1,4 +1,6 @@
-import { HostComponent, HostRoot, HostText } from "./ReactWorkTags";
+import { HostComponent, HostRoot, HostText,IndeterminateComponent, FunctionComponent } from "./ReactWorkTags";
+import { renderWithHooks } from 'react-reconciler/src/ReactFiberHooks';
+
 import { processUpdateQueue } from "./ReactFiberClassUpdateQueue";
 import { mountChildFibers, reconcileChildFibers } from "./ReactChildFiber";
 import { shouldSetTextContent } from "react-dom-bindings/src/client/ReactDOMHostConfig";
@@ -48,7 +50,13 @@ function updateHostComponent(current, workInProgress) {
   reconcileChildren(current, workInProgress, nextChildren);
   return workInProgress.child;
 }
-
+export function mountIndeterminateComponent(current, workInProgress, Component) {
+  const props = workInProgress.pendingProps;
+  const value = renderWithHooks(current, workInProgress, Component, props);
+  workInProgress.tag = FunctionComponent;
+  reconcileChildren(current, workInProgress, value);
+  return workInProgress.child;
+}
 /**
  * 开始根据新的虚拟DOM构建新的Fiber子链表
  * @param {FiberNode} current - 老的Fiber节点
@@ -57,6 +65,8 @@ function updateHostComponent(current, workInProgress) {
  */
 export function beginWork(current, workInProgress) {
   switch (workInProgress.tag) {
+    case IndeterminateComponent:
+      return mountIndeterminateComponent(current, workInProgress, workInProgress.type);
     case HostRoot:
       return updateHostRoot(current, workInProgress);
     case HostComponent:

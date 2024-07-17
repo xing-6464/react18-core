@@ -1,18 +1,18 @@
-import { scheduleCallback } from 'scheduler'
-import { createWorkInProgress } from './ReactFiber'
-import { beginWork } from './ReactFiberBeginWork'
-import { completeWork } from './ReactFiberCompleteWork'
-import { MutationMask, NoFlags } from './ReactFiberFlags'
-import { commitMutationEffects } from './ReactFiberCommitWork'
+import { scheduleCallback } from "scheduler";
+import { createWorkInProgress } from "./ReactFiber";
+import { beginWork } from "./ReactFiberBeginWork";
+import { completeWork } from "./ReactFiberCompleteWork";
+import { NoFlags, MutationMask } from "./ReactFiberFlags";
+import { commitMutationEffectsOnFiber } from './ReactFiberCommitWork';
 
-let workInProgress = null
+let workInProgress = null;
 
 /**
  * 在 Fiber 上计划更新根节点。
  * @param {*} root - 根节点。
  */
 export function scheduleUpdateOnFiber(root) {
-  ensureRootIsScheduled(root)
+  ensureRootIsScheduled(root);
 }
 
 /**
@@ -20,7 +20,7 @@ export function scheduleUpdateOnFiber(root) {
  * @param {*} root - 根节点。
  */
 function ensureRootIsScheduled(root) {
-  scheduleCallback(performConcurrentWorkOnRoot.bind(null, root))
+  scheduleCallback(performConcurrentWorkOnRoot.bind(null, root));
 }
 
 /**
@@ -28,10 +28,10 @@ function ensureRootIsScheduled(root) {
  * @param {*} root - 根节点。
  */
 function performConcurrentWorkOnRoot(root) {
-  renderRootSync(root)
-  const finishedWork = root.current.alternate
-  root.finishedWork = finishedWork
-  commitRoot(root)
+  renderRootSync(root);
+  const finishedWork = root.current.alternate;
+  root.finishedWork = finishedWork;
+  commitRoot(root);
 }
 
 /**
@@ -39,14 +39,15 @@ function performConcurrentWorkOnRoot(root) {
  * @param {*} root - 根节点。
  */
 function commitRoot(root) {
-  const { finishedWork } = root
-  const subtreeHasEffects =
-    (finishedWork.subtreeFlags & MutationMask) != NoFlags
-  const rootHasEffect = (finishedWork.flags & MutationMask) != NoFlags
+  const { finishedWork } = root;
+  const subtreeHasEffects = (finishedWork.subtreeFlags & MutationMask) !== NoFlags;
+  const rootHasEffect = (finishedWork.flags & MutationMask) !== NoFlags;
+
   if (subtreeHasEffects || rootHasEffect) {
-    commitMutationEffects(finishedWork, root)
+    commitMutationEffectsOnFiber(finishedWork, root);
   }
-  root.current = finishedWork
+
+  root.current = finishedWork;
 }
 
 /**
@@ -54,7 +55,7 @@ function commitRoot(root) {
  * @param {*} root - 根节点。
  */
 function prepareFreshStack(root) {
-  workInProgress = createWorkInProgress(root.current, null)
+  workInProgress = createWorkInProgress(root.current, null);
 }
 
 /**
@@ -62,8 +63,8 @@ function prepareFreshStack(root) {
  * @param {*} root - 根节点。
  */
 function renderRootSync(root) {
-  prepareFreshStack(root)
-  workLoopSync()
+  prepareFreshStack(root);
+  workLoopSync();
 }
 
 /**
@@ -71,7 +72,7 @@ function renderRootSync(root) {
  */
 function workLoopSync() {
   while (workInProgress !== null) {
-    performUnitOfWork(workInProgress)
+    performUnitOfWork(workInProgress);
   }
 }
 
@@ -80,14 +81,14 @@ function workLoopSync() {
  * @param {*} unitOfWork - 工作单元。
  */
 function performUnitOfWork(unitOfWork) {
-  const current = unitOfWork.alternate
-  const next = beginWork(current, unitOfWork)
-  unitOfWork.memoizedProps = unitOfWork.pendingProps
+  const current = unitOfWork.alternate;
+  const next = beginWork(current, unitOfWork);
+  unitOfWork.memoizedProps = unitOfWork.pendingProps;
 
   if (next === null) {
-    completeUnitOfWork(unitOfWork)
+    completeUnitOfWork(unitOfWork);
   } else {
-    workInProgress = next
+    workInProgress = next;
   }
 }
 
@@ -96,20 +97,20 @@ function performUnitOfWork(unitOfWork) {
  * @param {*} unitOfWork - 工作单元。
  */
 function completeUnitOfWork(unitOfWork) {
-  let completedWork = unitOfWork
+  let completedWork = unitOfWork;
 
   do {
-    const current = completedWork.alternate
-    const returnFiber = completedWork.return
-    completeWork(current, completedWork)
+    const current = completedWork.alternate;
+    const returnFiber = completedWork.return;
+    completeWork(current, completedWork);
 
-    const siblingFiber = completedWork.sibling
+    const siblingFiber = completedWork.sibling;
     if (siblingFiber !== null) {
-      workInProgress = siblingFiber
-      return
+      workInProgress = siblingFiber;
+      return;
     }
 
-    completedWork = returnFiber
-    workInProgress = completedWork
-  } while (completedWork !== null)
+    completedWork = returnFiber;
+    workInProgress = completedWork;
+  } while (completedWork !== null);
 }
